@@ -4,42 +4,32 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout your source code from version control
+                // Checkout your code from the version control system
+                // For example, if you're using Git:
                 checkout scm
             }
         }
 
-      stages {
         stage('Build') {
             steps {
-                git 'https://github.com/LdKishan/Registration-2.git'
-              sh './mvnw clean compile'
+                // Build your project using Maven
+                sh 'mvn clean compile'
             }
         }
 
-         stages {
-        stage('Test') {
+        stage('Unit Tests') {
             steps {
-                
-              sh './mvnw test'
-              //bat '.\mvnw test'
+                // Run JUnit tests using Maven
+                sh 'mvn test'
             }
         }
-      
+    }
 
-        post('Unit Tests') {
-            steps {
-                // Set up your environment, install dependencies, etc.
-                sh 'maven install' // Example: Installing npm dependencies
-
-                // Run your unit tests
-                sh 'maven test' // Example: Running unit tests using npm
-
-                // Archive test results for later viewing in Jenkins
-                junit 'git 'https://github.com/LdKishan/Registration-2.git'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ' // Example: JUnit test report
-            }
+    post {
+        always {
+            // Archive test reports
+            junit '**/target/surefire-reports/*.xml'
         }
-
-        // Add more stages for other pipeline steps (e.g., build, deploy, etc.)
     }
 }
+
