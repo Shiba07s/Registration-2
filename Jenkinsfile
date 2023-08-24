@@ -1,35 +1,47 @@
 pipeline {
     agent any
-
-    stages {
-        stage('Checkout') {
+    
+    stages{
+        stage("clone code"){
             steps {
-                // Checkout your code from the version control system
-                // For example, if you're using Git:
-                checkout scm
+                echo "clone the code into github"
+                git url:"https://github.com/Shiba07s/Registration-2.git", branch:"master"
+            }
+            
+        }
+        stage ('Build'){
+            steps{
+                echo "successfully creating jar file"
+                sh 'mvn clean package'
             }
         }
-
-        stage('Build') {
+        stage("build code"){
             steps {
-                // Build your project using Maven
-                sh 'mvn clean compile'
+                echo "build image"
+                sh "docker build -t ldtech-docker.jar ."
             }
+            
         }
-
-        stage('Unit Tests') {
+        stage("push to docker hub"){
             steps {
-                // Run JUnit tests using Maven
-                sh 'mvn test'
+                 echo "Pushing the image to docker hub"
+                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                sh "docker tag ldtech-docker.jar ${env.dockerHubUser}/ldtech-docker.jar:latest"
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker push ${env.dockerHubUser}/ldtech-docker.jar:latest"
+                }
+                 
             }
+            
         }
-    }
-
-    post {
-        always {
-            // Archive test reports
-            junit '**/target/surefire-reports/*.xml'
+        stage("deploy"){
+            steps {
+                echo "deploy"
+                sh "docker-compose down && docker-compose up -d"
+               //sh "docker run -p 9095:9095 ldtech-docker.jar:latest"
+            }
+            
         }
+        
     }
 }
-
