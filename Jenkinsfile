@@ -18,7 +18,7 @@ pipeline {
         stage("build code"){
             steps {
                 echo "build image"
-                sh "docker build -t ldtech-docker.jar ."
+                sh "docker build -t registration-docker.jar ."
             }
             
         }
@@ -26,9 +26,9 @@ pipeline {
             steps {
                  echo "Pushing the image to docker hub"
                 withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker tag ldtech-docker.jar ${env.dockerHubUser}/ldtech-docker.jar:latest"
+                sh "docker tag registration-docker.jar ${env.dockerHubUser}/registration-docker.jar:latest"
                 sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker push ${env.dockerHubUser}/ldtech-docker.jar:latest"
+                sh "docker push ${env.dockerHubUser}/registration-docker.jar:latest"
                 }
                  
             }
